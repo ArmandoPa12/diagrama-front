@@ -64,7 +64,7 @@ const addCustomNode = () => {
     diagramManager.addNodeToDiagram("custom", { x: 300, y: 100 });
 };
 const addinputNode = () => {
-    // diagramManager.addInputNode("custom", { x: 100, y: 100 });
+    diagramManager.addRectangleTextNode("custom", { x: 100, y: 100 });
 };
 const addText = () => {
     diagramManager.addTextNode();
@@ -79,6 +79,9 @@ const changeColorButton = () => {
     }
     if (selectedNode.category == 'text'){
         diagramManager.changeNodeTextFontColor(color.value);
+    }
+    if (selectedNode.category == 'rectangleTextNode'){
+        diagramManager.changeNodeColor(color.value);
     }
 };
 const addTextSize = () => {

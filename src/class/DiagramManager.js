@@ -11,7 +11,7 @@ export class DiagramManager {
             if (selectedNode instanceof go.Node) {
                 console.log("Nodo seleccionado:", selectedNode.data);
             } else {
-                console.log("No hay nodo seleccionado");
+                // console.log("No hay nodo seleccionado");
             }
         });
 
@@ -64,7 +64,29 @@ export class DiagramManager {
                     new go.TextBlock({
                         font: 'italic 11pt Verdana'
                     }).bind('text', 'label')
-                )
+                ),
+
+            rectangleTextNode: new go.Node('Auto', {
+                resizable: true,
+                selectable: true
+            }).add(
+                new go.Shape('Rectangle', {
+                    fromLinkable: true,
+                    toLinkable: true,
+                    fromSpot: go.Spot.AllSides,
+                    toSpot: go.Spot.AllSides,
+                    fill: "lightgreen"
+                }).bind('fill', 'color'),
+
+                new go.TextBlock({
+                    margin: 12,
+                    maxSize: new go.Size(160, NaN),
+                    wrap: go.Wrap.Fit,
+                    editable: true
+                })
+                .bind("text", "text")
+                .bind("font", "fontSize", (size) => `bold ${size || 12}pt sans-serif`)
+            )
         };
     }
 
@@ -95,6 +117,7 @@ export class DiagramManager {
         this.diagram.nodeTemplateMap.add("default", this.nodeTemplates.default);
         this.diagram.nodeTemplateMap.add("custom", this.nodeTemplates.custom);
         this.diagram.nodeTemplateMap.add("text", this.nodeTemplates.text);
+        this.diagram.nodeTemplateMap.add("rectangleTextNode", this.nodeTemplates.rectangleTextNode);
         this.diagram.model = new go.GraphLinksModel([], []);
 
 
@@ -116,7 +139,7 @@ export class DiagramManager {
 
         model.addNodeData(nodeData);
 
-        console.log(nodeData);
+        // console.log(nodeData);
         model.commitTransaction("add node");
     }
 
@@ -137,6 +160,23 @@ export class DiagramManager {
         model.commitTransaction("add text");
     }
 
+    addRectangleTextNode(position = { x: 0, y: 0 }) {
+        const model = this.diagram.model;
+        model.startTransaction("add rectangle text node");
+
+        const nodeData = {
+            key: model.nodeDataArray.length + 1,
+            category: "rectangleTextNode",
+            loc: `${position.x} ${position.y}`,
+            text: "input",
+            color: "lightgreen"
+        };
+
+        model.addNodeData(nodeData);
+        // console.log("Nodo agregado:", nodeData);
+
+        model.commitTransaction("add rectangle text node");
+    }
 
     deleteSelectedNode() {
         const model = this.diagram.model;
@@ -157,6 +197,7 @@ export class DiagramManager {
         const model = this.diagram.model;
         const selectedNode = this.diagram.selection.first(); // Obtener el nodo seleccionado
 
+        console.log(selectedNode.data);
         if (selectedNode instanceof go.Node) {
             model.startTransaction("change color");
             model.setDataProperty(selectedNode.data, "color", newColor); // Cambiar el color
@@ -172,6 +213,7 @@ export class DiagramManager {
         const model = this.diagram.model;
         const selectedNode = this.diagram.selection.first();
 
+        console.log(selectedNode.data);
         if (selectedNode instanceof go.Node) {
             model.startTransaction("change text style");
             model.setDataProperty(selectedNode.data, "fontSize", size); // Cambiar el color
