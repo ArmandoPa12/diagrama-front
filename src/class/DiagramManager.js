@@ -287,4 +287,21 @@ export class DiagramManager {
             console.log('error al cargar', error);
         }
     }
+    setNodeMovedCallback(callback) {
+        this.onNodeMoved = callback;
+
+        let timeout = null;
+
+        this.diagram.addDiagramListener("SelectionMoved", (e) => {
+            clearTimeout(timeout);
+
+            timeout = setTimeout(() => {
+                console.log("✅ Nodo movido, listo para enviar al servidor");
+                const json = this.saveDiagram();
+                callback(json);
+            }, 200);
+        });
+    }
+
+
 }

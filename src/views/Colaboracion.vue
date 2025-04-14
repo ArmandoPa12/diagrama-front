@@ -91,16 +91,30 @@ onMounted(async () => {
         });
 
         socket.on("load-diagram", (data) => {
-            // console.log(JSON.parse(data.payload))
             if (diagramRef.value) {
                 diagramManager = new DiagramManager(diagramRef.value);
                 diagramManager.loadDiagram(JSON.parse(data.payload));
+
+                console.log("🧪 Llamando a setNodeMovedCallback");
+                diagramManager.setNodeMovedCallback((json) => {
+                    console.log("🧪 Callback ejecutado con:", json);
+                    socket.emit("save-diagram", {
+                        codigo: codigo.value,
+                        diagrama: json
+                    });
+                });
+
             }
         });
+
 
         socket.on("update-diagram", (data) => {
             if (diagramRef.value) {
                 diagramManager.loadDiagram(JSON.parse(data.payload.diagrama));
+
+                // if (this.onNodeMoved) {
+                //     this.setNodeMovedCallback(this.onNodeMoved);
+                // }
             }
         });
 
@@ -118,14 +132,14 @@ onBeforeUnmount(() => {
 const addCustomNode = () => {
     diagramManager.addNodeToDiagram("custom", { x: 300, y: 100 });
     const json = diagramManager.saveDiagram();
-        socket.emit("add-node", {
-            codigo: codigo.value,
-            diagrama: json
-        });
-    // setTimeout(() => {
-        
-    // }, 0);
+    socket.emit("add-node", {
+        codigo: codigo.value,
+        diagrama: json
+    });
+
 };
+
+
 
 
 

@@ -3,6 +3,7 @@
         <div class="controls">
             <!-- <button @click="addCircleNode">Agregar Círculo</button>
             <button @click="addRectangleNode">Agregar Rectángulo</button> -->
+            <button @click="guardarDiagrama">Guardar</button>
             <button @click="addinputNode">Agregar input</button>
             <button @click="addCustomNode">Agregar Custom</button>
             <button @click="clearDiagram">Limpiar Diagrama</button>
@@ -74,6 +75,7 @@ const diagramRef = ref(null);
 const paletteRef = ref(null);
 const color = ref("#000000");
 const colorHistory = ref([]);
+const jsonData = ref("");
 const fontSize = ref(20);
 
 const colaboracionHabilitada = ref(false);
@@ -88,7 +90,25 @@ onMounted(() => {
     }
 });
 
+const guardarDiagrama = async () => {
+    if (diagramManager) {
+        jsonData.value = diagramManager.saveDiagram();
+        console.log(jsonData.value);
+        // try {
+        //     await proyecto.updateProyecto(
+        //         { nombre: "prueba1", diagrama: jsonData.value },
+        //         id.value);
+        //     console.log('termiando');
 
+        //     socket.emit("save-diagram", {
+        //         codigo: codigo.value,
+        //         diagrama: jsonData.value
+        //     });
+        // } catch (error) {
+        //     console.log(error);
+        // }
+    }
+}
 
 const saveColor = () => {
     if (!colorHistory.value.includes(color.value)) {

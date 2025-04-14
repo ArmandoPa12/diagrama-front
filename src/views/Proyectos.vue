@@ -63,7 +63,7 @@ const crearProyecto = async () => {
     const resultado = await proyecto.createProyecto({
       nombre: nombreProyecto.value,
       userId: auth.user.id,
-      diagrama: ""
+      diagrama: ''
     })
 
     console.log('Proyecto creado:', resultado)

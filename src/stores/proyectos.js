@@ -41,8 +41,6 @@ export const useProyectosStore = defineStore('proyecto', () => {
 
     const updateProyecto = async(datos, id) => {
         try {
-            // console.log(datos, id);
-            // console.log(`api/proyecto/${id}`);
             const res = await axios.post(`api/proyecto/${id}`, datos);
             return res.data;
         } catch (error) {
