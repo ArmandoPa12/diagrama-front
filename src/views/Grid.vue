@@ -16,6 +16,16 @@
             <br>
             <input type="color" v-model="color" id="colorPicker">
             <button @click="changeColorButton">Cambiar Color</button>
+            <div v-if="!colaboracionHabilitada">
+            <button @click="habilitarColaboracion">Habilitar colaboración en tiempo real</button>
+            </div>
+            <div class="color-grid">
+                <div v-for="(savedColor, index) in colorHistory" 
+                     :key="index" 
+                     :style="{ backgroundColor: savedColor }" 
+                     @click="color = savedColor">
+                </div>
+            </div>
         </div>
         <div class="container">
 
@@ -36,6 +46,20 @@
     height: 400px;
     border: 1px solid #ccc;
 }
+
+.color-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 30px);
+    grid-template-rows: repeat(4, 30px);
+    gap: 5px;
+    margin-top: 10px;
+}
+.color-grid div {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+}
 </style>
 
 <script setup>
@@ -45,13 +69,18 @@ import { DiagramManager } from "../class/DiagramManager.js";
 
 
 
+
 const diagramRef = ref(null);
 const paletteRef = ref(null);
-const color = ref(null);
+const color = ref("#000000");
+const colorHistory = ref([]);
 const fontSize = ref(20);
+
+const colaboracionHabilitada = ref(false);
 
 
 let diagramManager = null;
+let socket = null; 
 
 onMounted(() => {
     if (diagramRef.value) {
@@ -60,6 +89,15 @@ onMounted(() => {
 });
 
 
+
+const saveColor = () => {
+    if (!colorHistory.value.includes(color.value)) {
+        if (colorHistory.value.length >= 24) {
+            colorHistory.value.shift();
+        }
+        colorHistory.value.push(color.value);
+    }
+};
 const addCustomNode = () => {
     diagramManager.addNodeToDiagram("custom", { x: 300, y: 100 });
 };
@@ -83,6 +121,8 @@ const changeColorButton = () => {
     if (selectedNode.category == 'rectangleTextNode'){
         diagramManager.changeNodeColor(color.value);
     }
+
+    saveColor();
 };
 const addTextSize = () => {
     diagramManager.changeNodeTextFontZise(fontSize.value);

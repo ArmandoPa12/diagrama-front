@@ -48,7 +48,7 @@ export class DiagramManager {
                     resizable: true,
                     selectable: true,
                     resizeObjectName: 'mainShape',
-                    locationSpot: new go.Spot(0, 0, 30 / 2, 30 / 2) // Ajusta la posición según el tamaño de la celda
+                    locationSpot: new go.Spot(0, 0, 30 / 1, 30 / 1) // Ajusta la posición según el tamaño de la celda
                 })
                 .bindTwoWay('location', 'loc', go.Point.parse, go.Point.stringify)
                 .add(
@@ -93,26 +93,43 @@ export class DiagramManager {
     // Inicializa el diagrama
     initialize(diagramContainer) {
         const $ = go.GraphObject.make;
-        this.diagram = $(go.Diagram, diagramContainer, {
-            // contentAlignment: go.Spot.Center, // Centra el contenido en el diagrama
+        // this.diagram = $(go.Diagram, diagramContainer, {
+        //     // contentAlignment: go.Spot.Center, // Centra el contenido en el diagrama
 
-            'animationManager.isEnabled': false, // Desactiva las animaciones
-            'undoManager.isEnabled': true, // Habilita el deshacer/rehacer
-            // 'draggingTool.dragsLink': true, // Permite arrastrar los enlaces
-            // 'relinkingTool.isUnconnectedLinkValid': true, // Los enlaces pueden ser creados sin estar conectados
-            // 'linkingTool.isUnconnectedLinkValid': true, // Enlaces pueden estar sin conectar
-            'draggingTool.isGridSnapEnabled': true, // Ajuste a la rejilla al arrastrar
-            'draggingTool.gridSnapCellSpot': go.Spot.Center, // Ajuste al centro de la celda
-            'resizingTool.isGridSnapEnabled': true, // Ajuste a la rejilla al redimensionar
-            grid: $(go.Panel, "Grid", // Especificamos que la rejilla es de tipo "Grid"
-                {
-                    gridCellSize: new go.Size(20, 20), // Tamaño de las celdas
-                    visible: true
-                },
-                $(go.Shape, "LineH", { strokeWidth: 0.5, stroke: "lightgray" }), // Líneas horizontales
-                $(go.Shape, "LineV", { strokeWidth: 0.5, stroke: "lightgray" }) // Líneas verticales
-            ),
+        //     'animationManager.isEnabled': false, // Desactiva las animaciones
+        //     'undoManager.isEnabled': true, // Habilita el deshacer/rehacer
+        //     // 'draggingTool.dragsLink': true, // Permite arrastrar los enlaces
+        //     // 'relinkingTool.isUnconnectedLinkValid': true, // Los enlaces pueden ser creados sin estar conectados
+        //     // 'linkingTool.isUnconnectedLinkValid': true, // Enlaces pueden estar sin conectar
+        //     'draggingTool.isGridSnapEnabled': true, // Ajuste a la rejilla al arrastrar
+        //     'draggingTool.gridSnapCellSpot': go.Spot.Center, // Ajuste al centro de la celda
+        //     'resizingTool.isGridSnapEnabled': true, // Ajuste a la rejilla al redimensionar
+        //     grid: $(go.Panel, "Grid", // Especificamos que la rejilla es de tipo "Grid"
+        //         {
+        //             gridCellSize: new go.Size(10, 10), // Tamaño de las celdas
+        //             visible: true
+        //         },
+        //         $(go.Shape, "LineH", { strokeWidth: 0.5, stroke: "lightgray" }), // Líneas horizontales
+        //         $(go.Shape, "LineV", { strokeWidth: 0.5, stroke: "lightgray" }) // Líneas verticales
+        //     ),
+        // });
+
+        this.diagram = $(go.Diagram, diagramContainer, {
+            'animationManager.isEnabled': false,
+            'undoManager.isEnabled': true,
+            'draggingTool.isGridSnapEnabled': true,
+            'draggingTool.gridSnapCellSpot': go.Spot.Center,
+            'resizingTool.isGridSnapEnabled': true,
+            'initialDocumentSpot': go.Spot.TopLeft,
+            'initialViewportSpot': go.Spot.TopLeft,
+            // 'layout': null,
+            grid: $(go.Panel, "Grid", { gridCellSize: new go.Size(10, 10), visible: true },
+                $(go.Shape, "LineH", { strokeWidth: 0.5, stroke: "lightgray" }),
+                $(go.Shape, "LineV", { strokeWidth: 0.5, stroke: "lightgray" })
+            )
         });
+
+
         // Configuración de la plantilla de nodos
         this.diagram.nodeTemplateMap.add("default", this.nodeTemplates.default);
         this.diagram.nodeTemplateMap.add("custom", this.nodeTemplates.custom);
@@ -255,5 +272,19 @@ export class DiagramManager {
     clearDiagram() {
         this.diagram.model.nodeDataArray = [];
         this.diagram.model.linkDataArray = [];
+    }
+
+    saveDiagram() {
+        const diagrama = this.diagram.model.toJson();
+        return diagrama;
+    }
+
+    loadDiagram(json) {
+        try {
+            this.diagram.model = go.Model.fromJson(json);
+            console.log('modelo cargado');
+        } catch (error) {
+            console.log('error al cargar', error);
+        }
     }
 }
