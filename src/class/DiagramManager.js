@@ -1,7 +1,7 @@
 import * as go from "gojs";
 
 export class DiagramManager {
-    constructor(diagramContainer) {
+    constructor(diagramContainer, onNodeSelectedCallback) {
         this.diagram = null;
         this.nodeTemplates = this.getNodeTemplates();
         this.initialize(diagramContainer);
@@ -10,8 +10,13 @@ export class DiagramManager {
             const selectedNode = this.diagram.selection.first(); // Obtiene el primer nodo seleccionado
             if (selectedNode instanceof go.Node) {
                 console.log("Nodo seleccionado:", selectedNode.data);
+                if (typeof onNodeSelectedCallback === 'function') {
+                    onNodeSelectedCallback(selectedNode.data);
+                }
             } else {
-                // console.log("No hay nodo seleccionado");
+                if (typeof onNodeSelectedCallback === 'function') {
+                    onNodeSelectedCallback(null);
+                }
             }
         });
 
@@ -27,21 +32,24 @@ export class DiagramManager {
 
             // para texto
             text: new go.Node("Auto", {
-                layerName: "Foreground", // Para que el texto siempre esté arriba
-                selectable: true, // Permitir seleccionar y editar
-                resizable: true, // Permitir redimensionar
-                resizeObjectName: "TEXT" // El objeto a redimensionar es el texto
-            }).add(
-                new go.TextBlock({
-                    margin: 5,
-                    name: "TEXT",
-                    font: "bold 12pt sans-serif", // Valor por defecto
-                    editable: true // Permite edición directa
+                    layerName: "Foreground", // Para que el texto siempre esté arriba
+                    selectable: true, // Permitir seleccionar y editar
+                    resizable: true, // Permitir redimensionar
+                    resizeObjectName: "TEXT" // El objeto a redimensionar es el texto
+
                 })
-                .bind("text", "text") // Vincular el texto
-                .bind("font", "fontSize", (size) => `bold ${size || 12}pt sans-serif`) // Tamaño dinámico
-                .bind("stroke", "textColor")
-            ),
+                .bindTwoWay('location', 'loc', go.Point.parse, go.Point.stringify)
+                .add(
+                    new go.TextBlock({
+                        margin: 5,
+                        name: "TEXT",
+                        font: "bold 12pt sans-serif", // Valor por defecto
+                        editable: true // Permite edición directa
+                    })
+                    .bindTwoWay("text", "text")
+                    .bind("font", "fontSize", (size) => `bold ${size || 12}pt sans-serif`) // Tamaño dinámico
+                    .bind("stroke", "textColor")
+                ),
 
             //custom
             custom: new go.Node('Spot', {
@@ -67,53 +75,71 @@ export class DiagramManager {
                 ),
 
             rectangleTextNode: new go.Node('Auto', {
-                resizable: true,
-                selectable: true
-            }).add(
-                new go.Shape('Rectangle', {
-                    fromLinkable: true,
-                    toLinkable: true,
-                    fromSpot: go.Spot.AllSides,
-                    toSpot: go.Spot.AllSides,
-                    fill: "lightgreen"
-                }).bind('fill', 'color'),
-
-                new go.TextBlock({
-                    margin: 12,
-                    maxSize: new go.Size(160, NaN),
-                    wrap: go.Wrap.Fit,
-                    editable: true
+                    locationSpot: go.Spot.Center,
+                    resizable: true,
+                    selectable: true,
+                    resizeObjectName: 'mainShape'
                 })
-                .bind("text", "text")
-                .bind("font", "fontSize", (size) => `bold ${size || 12}pt sans-serif`)
-            )
+                .bindTwoWay("location", "loc", go.Point.parse, go.Point.stringify)
+                .add(
+                    new go.Shape('Rectangle', {
+                        name: 'mainShape',
+                        fromLinkable: true,
+                        toLinkable: true,
+                        fromSpot: go.Spot.AllSides,
+                        toSpot: go.Spot.AllSides,
+                        fill: "lightgreen"
+                    })
+                    .bind('fill', 'color'),
+                    new go.TextBlock({
+                        margin: 12,
+                        maxSize: new go.Size(160, NaN),
+                        wrap: go.Wrap.Fit,
+                        editable: true
+                    })
+                    .bindTwoWay("text", "text")
+                    .bind("font", "fontSize", (size) => `bold ${size || 12}pt sans-serif`)
+                ),
+
+
+            select: new go.Node("Auto", {
+                    locationSpot: go.Spot.Center,
+                    resizable: true,
+                    selectable: true,
+                    resizeObjectName: "SHAPE"
+                })
+                .bindTwoWay("location", "loc", go.Point.parse, go.Point.stringify)
+                .add(
+                    new go.Shape("Rectangle", {
+                        name: "SHAPE",
+                        fill: "lightyellow",
+                        stroke: "gray"
+                    })
+                    .bind("fill", "color")
+                    .bindTwoWay("desiredSize", "size", go.Size.parse, go.Size.stringify),
+
+                    new go.Panel("Vertical", {
+                        itemTemplate: new go.Panel("Auto")
+                            .add(
+                                new go.Shape("Rectangle", {
+                                    fill: "white",
+                                    stroke: null
+                                }),
+                                new go.TextBlock({
+                                    margin: 2,
+                                    editable: true,
+                                    font: "10pt sans-serif"
+                                }).bindTwoWay("text", "")
+                            )
+                    })
+                    .bind("itemArray", "options")
+                )
         };
     }
 
     // Inicializa el diagrama
     initialize(diagramContainer) {
         const $ = go.GraphObject.make;
-        // this.diagram = $(go.Diagram, diagramContainer, {
-        //     // contentAlignment: go.Spot.Center, // Centra el contenido en el diagrama
-
-        //     'animationManager.isEnabled': false, // Desactiva las animaciones
-        //     'undoManager.isEnabled': true, // Habilita el deshacer/rehacer
-        //     // 'draggingTool.dragsLink': true, // Permite arrastrar los enlaces
-        //     // 'relinkingTool.isUnconnectedLinkValid': true, // Los enlaces pueden ser creados sin estar conectados
-        //     // 'linkingTool.isUnconnectedLinkValid': true, // Enlaces pueden estar sin conectar
-        //     'draggingTool.isGridSnapEnabled': true, // Ajuste a la rejilla al arrastrar
-        //     'draggingTool.gridSnapCellSpot': go.Spot.Center, // Ajuste al centro de la celda
-        //     'resizingTool.isGridSnapEnabled': true, // Ajuste a la rejilla al redimensionar
-        //     grid: $(go.Panel, "Grid", // Especificamos que la rejilla es de tipo "Grid"
-        //         {
-        //             gridCellSize: new go.Size(10, 10), // Tamaño de las celdas
-        //             visible: true
-        //         },
-        //         $(go.Shape, "LineH", { strokeWidth: 0.5, stroke: "lightgray" }), // Líneas horizontales
-        //         $(go.Shape, "LineV", { strokeWidth: 0.5, stroke: "lightgray" }) // Líneas verticales
-        //     ),
-        // });
-
         this.diagram = $(go.Diagram, diagramContainer, {
             'animationManager.isEnabled': false,
             'undoManager.isEnabled': true,
@@ -122,7 +148,9 @@ export class DiagramManager {
             'resizingTool.isGridSnapEnabled': true,
             'initialDocumentSpot': go.Spot.TopLeft,
             'initialViewportSpot': go.Spot.TopLeft,
-            // 'layout': null,
+            'commandHandler.deletesTree': false,
+            'commandHandler.canDeleteSelection': () => false,
+
             grid: $(go.Panel, "Grid", { gridCellSize: new go.Size(10, 10), visible: true },
                 $(go.Shape, "LineH", { strokeWidth: 0.5, stroke: "lightgray" }),
                 $(go.Shape, "LineV", { strokeWidth: 0.5, stroke: "lightgray" })
@@ -135,22 +163,23 @@ export class DiagramManager {
         this.diagram.nodeTemplateMap.add("custom", this.nodeTemplates.custom);
         this.diagram.nodeTemplateMap.add("text", this.nodeTemplates.text);
         this.diagram.nodeTemplateMap.add("rectangleTextNode", this.nodeTemplates.rectangleTextNode);
+        this.diagram.nodeTemplateMap.add("select", this.nodeTemplates.select);
         this.diagram.model = new go.GraphLinksModel([], []);
 
 
     }
 
-    addNodeToDiagram(type, position = { x: 0, y: 0 }) {
+    addNodeToDiagram(type, size = { x: 0, y: 0 }, position = { x: 0, y: 0 }) {
         const model = this.diagram.model;
         model.startTransaction("add node");
 
-        // Create the node data based on type
         const nodeData = {
             key: model.nodeDataArray.length + 1,
             category: "custom",
+            type: type,
             loc: `${position.x} ${position.y}`,
             color: "lightblue", // Default color
-            size: "80 30", // Size as string for custom node
+            size: `${size.x} ${size.y}`, // Size as string for custom node
             label: "" // Label for custom node
         };
 
@@ -158,9 +187,11 @@ export class DiagramManager {
 
         // console.log(nodeData);
         model.commitTransaction("add node");
+        return nodeData;
+
     }
 
-    addTextNode(position = { x: 0, y: 0 }, text = "Nuevo Texto") {
+    addTextNode(tipo, text = "Nuevo Texto", position = { x: 0, y: 0 }) {
         const model = this.diagram.model;
         model.startTransaction("add text");
 
@@ -168,31 +199,54 @@ export class DiagramManager {
             key: model.nodeDataArray.length + 1,
             category: "text", // Usa la nueva plantilla de texto
             loc: `${position.x} ${position.y}`,
-            text: text
+            text: text,
+            fontSize: 10,
+            type: tipo
         };
 
         model.addNodeData(textNode);
         console.log("Texto agregado:", textNode);
 
         model.commitTransaction("add text");
+
+        return textNode;
     }
 
-    addRectangleTextNode(position = { x: 0, y: 0 }) {
+    addRectangleTextNode(type, size = { x: 80, y: 30 }, text, position = { x: 0, y: 0 }) {
         const model = this.diagram.model;
         model.startTransaction("add rectangle text node");
-
         const nodeData = {
             key: model.nodeDataArray.length + 1,
             category: "rectangleTextNode",
             loc: `${position.x} ${position.y}`,
-            text: "input",
-            color: "lightgreen"
+            text: text,
+            color: "lightgreen",
+            size: `${size.x} ${size.y}`,
+            type: type,
+            opciones: [],
+            validation: [],
         };
+        console.log(nodeData);
 
         model.addNodeData(nodeData);
         // console.log("Nodo agregado:", nodeData);
 
         model.commitTransaction("add rectangle text node");
+        return nodeData;
+    }
+
+    addSelectNode(position = { x: 0, y: 0 }) {
+        const model = this.diagram.model;
+        model.startTransaction("add select node");
+        model.addNodeData({
+            key: model.nodeDataArray.length + 1,
+            category: "select", // coincide con el template arriba
+            loc: `${position.x} ${position.y}`,
+            color: "lightyellow", // color de fondo
+            size: "100 60", // ancho x alto inicial
+            options: ["Opción 1"] // arranca con una única opción
+        });
+        model.commitTransaction("add select node");
     }
 
     deleteSelectedNode() {
@@ -205,9 +259,12 @@ export class DiagramManager {
             model.commitTransaction("delete node");
 
             console.log("Nodo eliminado:", selectedNode.data);
+            return selectedNode
         } else {
             console.log("No hay nodo seleccionado para eliminar");
+            return null
         }
+
     }
 
     changeNodeColor(newColor) {
@@ -280,28 +337,91 @@ export class DiagramManager {
     }
 
     loadDiagram(json) {
-        try {
-            this.diagram.model = go.Model.fromJson(json);
-            console.log('modelo cargado');
-        } catch (error) {
-            console.log('error al cargar', error);
+            try {
+                this.diagram.model = go.Model.fromJson(json);
+                console.log('modelo cargado');
+            } catch (error) {
+                console.log('error al cargar', error);
+            }
         }
-    }
+        // setNodeMovedCallback(callback) {
+        //     // this.onNodeMoved = callback;
+
+    //     // let timeout = null;
+
+    //     // this.diagram.addDiagramListener("SelectionMoved", (e) => {
+    //     //     clearTimeout(timeout);
+
+    //     //     timeout = setTimeout(() => {
+    //     //         console.log("✅ Nodo movido, listo para enviar al servidor");
+    //     //         const json = this.saveDiagram();
+    //     //         callback(json);
+    //     //     }, 200);
+    //     // });
+
+    //     this.onDiagramChanged = callback;
+
+    //     let timeout = null;
+
+    //     this.diagram.model.addChangedListener((e) => {
+    //         const isNodeData = this.diagram.model.nodeDataArray.includes(e.object);
+    //         const isNodeInsertOrRemove = (
+    //             (e.change === go.ChangedEvent.Insert || e.change === go.ChangedEvent.Remove) &&
+    //             e.modelChange === "nodeDataArray"
+    //         );
+
+    //         const isNodePropertyChange = (
+    //             e.change === go.ChangedEvent.Property &&
+    //             e.modelChange === "" &&
+    //             isNodeData
+    //         );
+
+    //         if (isNodeInsertOrRemove || isNodePropertyChange) {
+    //             clearTimeout(timeout);
+    //             timeout = setTimeout(() => {
+    //                 const json = this.saveDiagram();
+    //                 console.log("✅ Cambio en el diagrama detectado y enviado:", json);
+    //                 callback(json);
+    //             }, 200);
+    //         }
+    //     });
+    // }
+
     setNodeMovedCallback(callback) {
-        this.onNodeMoved = callback;
+        this.onDiagramChanged = callback;
+        this._registerChangeListener();
+    }
 
+    _registerChangeListener() {
         let timeout = null;
-
-        this.diagram.addDiagramListener("SelectionMoved", (e) => {
+        this.diagram.model.addChangedListener((e) => {
             clearTimeout(timeout);
-
             timeout = setTimeout(() => {
-                console.log("✅ Nodo movido, listo para enviar al servidor");
                 const json = this.saveDiagram();
-                callback(json);
+                this.onDiagramChanged(json);
             }, 200);
         });
+
     }
 
+    loadDiagram(json) {
+        this.diagram.model = go.Model.fromJson(json);
+
+        // Registrar de nuevo el listener
+        this._registerChangeListener();
+    }
+
+    getDiagramImageData() {
+        if (!this.diagram) return null;
+
+        const imageData = this.diagram.makeImageData({
+            background: "white", // color de fondo
+            scale: 1, // escala de la imagen
+            type: "image/png", // tipo MIME
+            imageFormat: "png" // formato de la imagen
+        });
+
+        return imageData; // devuelve una URL tipo data:image/png;base64,...
+    }
 
 }

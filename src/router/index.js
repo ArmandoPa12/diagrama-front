@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 import Example from '@/views/Example.vue'
 import Grid from '@/views/Grid.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -8,6 +7,7 @@ import Dashboard from '@/views/Dashboard.vue'
 import Socket from '@/views/socket.vue'
 import Diagrama from '@/views/Diagrama.vue'
 import Colaboracion from '@/views/Colaboracion.vue'
+import ConversionView from '@/views/ConversionView.vue'
 
 const router = createRouter({
     history: createWebHistory(
@@ -20,7 +20,45 @@ const router = createRouter({
         {
             path: '/dashboard',
             component: Dashboard,
-            meta: { requiresAuth: true }
+            meta: { requiresAuth: true },
+            children: [
+
+                {
+                    path: '/',
+                    redirect: '/dashboard'
+                },
+                {
+                    path: '/about',
+                    name: 'about',
+                    component: () =>
+                        import ('../views/AboutView.vue'),
+                    meta: { requiresAuth: true }
+                },
+                {
+                    path: '/socket',
+                    name: 'socket',
+                    component: Socket,
+                    meta: { requiresAuth: true }
+                },
+                {
+                    path: '/home-convert',
+                    name: 'home-convert',
+                    component: ConversionView,
+                    meta: { requiresAuth: true }
+                },
+                {
+                    path: '/example',
+                    name: 'example',
+                    component: Example,
+                    meta: { requiresAuth: true }
+                },
+                {
+                    path: '/grid',
+                    name: 'grid',
+                    component: Grid,
+                    meta: { requiresAuth: true }
+                },
+            ]
         },
         {
             path: '/diagrama/:id/:codigo',
@@ -30,41 +68,11 @@ const router = createRouter({
         },
         {
             path: '/colaborativo/:codigo',
-            component: Colaboracion,
+            component: Diagrama,
             name: 'colaborativo',
             meta: { requiresAuth: true }
         },
-        {
-            path: '/',
-            name: 'home',
-            component: HomeView,
-            meta: { requiresAuth: true }
-        },
-        {
-            path: '/about',
-            name: 'about',
-            component: () =>
-                import ('../views/AboutView.vue'),
-            meta: { requiresAuth: true }
-        },
-        {
-            path: '/socket',
-            name: 'socket',
-            component: Socket,
-            meta: { requiresAuth: true }
-        },
-        {
-            path: '/example',
-            name: 'example',
-            component: Example,
-            meta: { requiresAuth: true }
-        },
-        {
-            path: '/grid',
-            name: 'grid',
-            component: Grid,
-            meta: { requiresAuth: true }
-        },
+
     ],
 })
 

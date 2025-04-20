@@ -48,9 +48,18 @@ export const useProyectosStore = defineStore('proyecto', () => {
         }
     };
 
+    const cerrarProyecto = async(datos, id) => {
+        try {
+            const res = await axios.post(`api/proyecto/${id}/imagen`, datos);
+            return res.data;
+        } catch (error) {
+            throw error;
+        }
+    };
+
 
 
     const totalProyectos = computed(() => proyectos.value.length)
 
-    return { getProyectos, proyectos, totalProyectos, createProyecto, getProyectoUno, updateProyecto }
+    return { getProyectos, proyectos, totalProyectos, createProyecto, getProyectoUno, updateProyecto, cerrarProyecto }
 })

@@ -1,28 +1,72 @@
 <template>
   <div>
-    aqui estan los proyectos
-    <div>Total proyectos: {{ proyecto.totalProyectos }}</div>
 
-    <div v-if="codigoSala" class="mt-4">
-      <p>Código de sala: <strong>{{ codigoSala }}</strong></p>
-    </div>
+      <div class="row">
+        <div class="col">
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" v-model="nombreProyecto" placeholder="Nuevo proyecto" aria-label="Recipient's username"
+              aria-describedby="basic-addon2">
+            <div class="input-group-append">
+              <button class="btn btn-outline-primary" @click="crearProyecto" type="button">Crear</button>
+            </div>
+          </div>
+        </div>
+        <div class="col"></div>
+        <div class="col">
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" v-model="codigoColaboracion" placeholder="codigo proyecto" aria-label="Recipient's username"
+              aria-describedby="basic-addon2">  
+            <div class="input-group-append">
+              <button class="btn btn-outline-success"  @click="unirseProyecto" type="button">Unirse</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <input type="text" v-model="nombreProyecto" id="nombre">
-    <button @click="crearProyecto">Crear Proyecto</button>
 
-    <input type="text" v-model="codigoColaboracion" id="codigo">
-    <button @click="unirseProyecto">Unirse a otro proyecto</button>
-    
     <p v-if="mensajeError">{{ mensajeError }}</p>
 
-    <li :key="item.id" v-for="item in proyecto.proyectos">
-      {{ item.id }}
-      {{ item.nombre }}
-      {{ item.createdAt }} -
-      {{ item.sala ? item.sala.codigo : 'No existe código' }}
-      <button v-if="item.sala" @click="entrarDiagrama(item.sala.codigo,item.id)">Entrar</button>
-      <br>
-    </li>
+    <div class="album py-5 bg-body-tertiary">
+      <div class="container">
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+          <div :key="item.id" v-for="item in proyecto.proyectos" class="col">
+            <div class="card shadow-sm">
+              <img v-if="item.imagenUrl" :src="`${backendUrl}${item.imagenUrl}`" class="card-img-top"
+                alt="Imagen del diagrama" style="height: 225px; object-fit: contain; object-position: center" />
+              <div v-else style="
+                    height: 225px;
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background-color: #f0f0f0;
+                    color: #888;
+                    font-size: 1rem;
+                    font-weight: 500;
+                    border-bottom: 1px solid #ddd;
+                  ">
+                No hay imagen
+              </div>
+              <div class="card-body">
+                <strong class="card-text">{{ item.nombre }}</strong>
+                <!-- <p class="card-text">Creado el: {{ formatFecha(item.updatedAt) }}</p> -->
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="btn-group">
+                    <button type="button"  v-if="item.sala" @click="entrarDiagrama(item.sala.codigo, item.id)" class="btn btn-sm btn-outline-secondary">Entrar</button>
+                    <!-- <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button> -->
+                  </div>
+                  <small class="text-body-secondary">{{ formatFecha(item.updatedAt) }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -33,6 +77,11 @@ import { Router } from 'gojs';
 import { ref, onMounted } from "vue";
 import { useRouter } from 'vue-router'
 import { useSalaStore } from '@/stores/salas'
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+import moment from 'moment'
+import 'moment/locale/es'
+
+moment.locale('es')
 
 
 const proyecto = useProyectosStore();
@@ -44,6 +93,7 @@ const proyectos = ref([]);
 const mensajeError = ref("")
 const codigoSala = ref(null)
 const codigoColaboracion = ref("");
+
 
 onMounted(() => {
   proyecto.getProyectos({ userId: auth.user.id });
@@ -77,13 +127,20 @@ const crearProyecto = async () => {
     codigoSala.value = data.sala.codigo
 
     // Redirigir a la ruta con el código de la sala
+    // router.push({
+    //   name: 'diagrama',
+    //   params: {
+    //     id: resultado.id,
+    //     codigo: codigoSala.value
+    //   }
+    // })
     router.push({
       name: 'diagrama',
       params: {
         id: resultado.id,
         codigo: codigoSala.value
       }
-    })
+    });
 
     // Limpiar input
     nombreProyecto.value = ''
@@ -92,25 +149,30 @@ const crearProyecto = async () => {
     // Manejar errores de creación de proyecto o sala
     const msg =
       err.response?.data?.errors?.[0]?.msg ||
-      err.response?.data?.message || 
+      err.response?.data?.message ||
       "Error desco  nocido"
     mensajeError.value = msg
     console.error("Error:", err)
   }
 }
 
-const entrarDiagrama = (codigo,id) => {
+const entrarDiagrama = (codigo, id) => {
   router.push({
     name: 'diagrama',
-    params: { id:id ,codigo: codigo }
+    params: { id: id, codigo: codigo }
   });
 };
 
-const unirseProyecto = async() =>{
+const formatFecha = (fecha) => {
+  // return moment(fecha).startOf('hour').fromNow();
+  return moment(fecha).format('LT');
+}
+
+const unirseProyecto = async () => {
   try {
     const res = await sala.colaboradorSala({
-    "usuarioId":auth.user.id,
-    "codigo":codigoColaboracion.value
+      "usuarioId": auth.user.id,
+      "codigo": codigoColaboracion.value
     });
 
     router.push({
@@ -118,7 +180,7 @@ const unirseProyecto = async() =>{
       params: {
         codigo: codigoColaboracion.value
       }
-    })
+    });
   } catch (error) {
     mensajeError.value = error.response.data.message;
     console.log(error.response.data.message);
