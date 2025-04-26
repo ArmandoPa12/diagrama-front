@@ -55,6 +55,8 @@
                                     <li><button @click="addinputNode('input')" class="link-dark rounded">Input</button>
                                     </li>
                                     <li><button @click="addText()" class="link-dark rounded">Text</button></li>
+                                    <li><button @click="addinputNode('button', {  x: 130, y: 150 })"
+                                        class="link-dark rounded">Boton</button></li>
                                     <li><button @click="addText('link', 'link')" class="link-dark rounded">link</button>
                                     </li>
                                     <li><button @click="addCustomNode('nav', { x: 1160, y: 70 })"
@@ -65,6 +67,8 @@
                                             class="link-dark rounded">Lista</button></li>
                                     <li><button @click="addCustomNode('table', { x: 730, y: 390 })"
                                             class="link-dark rounded">Tabla</button></li>
+                                    <li><button @click="addCustomNode('div', { x: 210, y: 60 })"
+                                            class="link-dark rounded">Div</button></li>
                                 </ul>
                             </div>
 
@@ -120,49 +124,24 @@
                                 <button @click="addinputNode('submit', { x: 80, y: 30 }, 'submit')"
                                     class="link-dark rounded">+Submit</button>
                             </div>
+                            <div v-if="selectedNode.type === 'table'">
+                                <button @click="addText('title', 'title')" class="link-dark rounded me-2">Titulo+</button>
+                                <button @click="addText('body', 'body')" class="link-dark rounded">body+</button>
+                            </div>
                         </div>
-
-                        <!-- <div v-if="selectedNode">
-
-                            <p><strong> {{ selectedNode.type }}</strong></p>
-                            <button class="link-dark rounded" @click="deleteNode">Eliminar</button>
-
-                            <div  v-if="selectedNode.category === 'rectangleTextNode' && !selectedNode?.type === 'nav' " >                                
-                                <select id="node-type"
-                                    v-model="selectedNode.type" @change="updateNodeType">
-                                    <option value="text">Text</option>
-                                    <option value="number">Number</option>
-                                    <option value="email">Email</option>
-                                    <option value="password">Password</option>
-                                    <option value="select">Select</option>
-                                </select>
-                            </div>
-
-                            <input type="color" v-model="color" id="colorPicker">
-                            <a class="badge text-bg-light rounded-pill" @click="changeColorButton">Cambiar color</a>
-
-                            <div v-if="selectedNode?.type === 'select'">
-                                <div v-for="(item, index) in valores" :key="index" class="mb-2 d-flex">
-                                    <input v-model="valores[index]" type="text" class="form-control me-2"
-                                        placeholder="Opción" />
-                                </div>
-                                <button @click="agregarCampo" class="btn btn-success me-2" type="button">+</button>
-                                <button @click="updateNodeType" class="btn btn-primary" type="button">Confirmar</button>
-                            </div>
-
-                            <div v-if="selectedNode?.type === 'nav'">
-                                agregar boton
-                                <button @click="addinputNode('button')" class="link-dark rounded">+Boton</button>
-                            </div>
-
-
-                        </div> -->
                     </ul>
                 </div>
-                <div class="col-1 p-3" >
-                    <!-- <ArbolJerarquico :arbolJerarquico="arbolJerarquico" @update="guardarCambios" /> -->
+                <div class="col-2 p-3">
+                        <!-- <div v-if="arbolJerarquico">
+                            {{ arbolJerarquico }}
+                            <pre>{{ formatearArbol(arbolJerarquico) }}</pre>
+                        </div> -->
+
+                        <div v-if="arbolJerarquico" class="arbol-visual">
+    <pre>{{ formatearArbol(arbolJerarquico) }}</pre>
+  </div>
                 </div>
-                <div class="col-10 p-3">
+                <div class="col-9 p-3">
                     <div ref="diagramRef" style="width: 100%; height: 670px; border: 1px solid #ccc"></div>
                 </div>
             </div>
@@ -200,6 +179,16 @@
     cursor: pointer;
     border: 1px solid #ccc;
 }
+
+.arbol-visual {
+  font-family: monospace;
+  text-align: left;
+  white-space: pre;
+  background-color: #f8f8f8;
+  padding: 10px;
+  border-radius: 4px;
+  overflow-x: auto;
+}
 </style>
 
 <script setup>
@@ -212,7 +201,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useSalaStore } from '@/stores/salas';
 import { io } from "socket.io-client";
 import * as bootstrap from 'bootstrap'
-import { agregarNodoAlArbol,eliminarNodoDelArbol } from '@/auxiliar/Arbol.js';
+import { agregarNodoAlArbol, eliminarNodoDelArbol } from '@/auxiliar/Arbol.js';
 // import TreeView from "@/components/TreeView.vue";
 
 
@@ -244,7 +233,7 @@ let popoverInstance = null
 const arbolJerarquico = ref();
 // websocket
 let socket = null;
-
+let inicializado = false;
 
 
 let diagramManager = null;
@@ -281,27 +270,45 @@ onMounted(async () => {
         });
 
         socket.on("load-diagram", (data) => {
+
+            if (inicializado) return;
+            console.log(data.payload);
+
+
+            const arbol = JSON.parse(data.payload)[1]
+            const diagramaRaw = JSON.parse(data.payload)[0]
+
+
             if (diagramRef.value) {
                 diagramManager = new DiagramManager(diagramRef.value, (nodeData) => {
                     selectedNode.value = nodeData
                 });
-                diagramManager.loadDiagram(JSON.parse(data.payload));
+
+                // console.log(rawDiagram);
+                diagramManager.loadDiagram(diagramaRaw);
 
                 // console.log("🧪 Llamando a setNodeMovedCallback");
                 diagramManager.setNodeMovedCallback((json) => {
                     // console.log("🧪 Callback ejecutado con:", json);
                     socket.emit("save-diagram", {
                         codigo: codigoSala.value,
-                        diagrama: json
+                        diagrama: [json, arbolJerarquico.value]
                     });
                 });
 
             }
+
+
+            if (arbol) {
+                arbolJerarquico.value = arbol
+            }
+            inicializado = true;
         });
         socket.on("update-diagram", (data) => {
+            const model = JSON.parse(data.payload.diagrama)
             if (diagramRef.value) {
-                diagramManager.loadDiagram(JSON.parse(data.payload.diagrama));
-
+                diagramManager.loadDiagram(model[0]);
+                arbolJerarquico.value = model[1];
             }
         });
 
@@ -312,8 +319,25 @@ onBeforeUnmount(() => {
     if (socket && socket.readyState === WebSocket.OPEN) {
         socket.close();
     }
+    console.log('cerrado componente');
+
     generarImagenDelDiagrama();
 })
+const formatearArbol = (nodo, nivel = 0) => {
+  if (!nodo) return '';
+  
+  const indentacion = '    '.repeat(nivel);
+  const flechas = nivel > 0 ? '-->' : '';
+  let resultado = `${indentacion}${flechas}${nodo.text}\n`;
+  
+  if (nodo.children && nodo.children.length > 0) {
+    for (const hijo of nodo.children) {
+      resultado += formatearArbol(hijo, nivel + 1);
+    }
+  }
+  
+  return resultado;
+};
 
 const generarContenidoHTML = () => {
     return `
@@ -329,13 +353,15 @@ function agregarCampo() {
 
     }
 }
+
 watch(selectedNode, (newNode) => {
-    if (newNode?.type === 'select' && Array.isArray(newNode.valores)) {
-        valores.value = [...newNode.valores]
+    if (newNode?.type === 'select' && Array.isArray(newNode.opciones)) {
+        valores.value = [...newNode.opciones];
     } else {
-        valores.value = []
+        valores.value = [];
     }
-})
+});
+
 
 const getMiembros = async () => {
     try {
@@ -351,8 +377,8 @@ const getMiembros = async () => {
 
 }
 function guardarCambios(nuevoArbol) {
-  console.log('Árbol actualizado con drag-and-drop:', nuevoArbol);
-  // Aquí podrías emitir por socket o guardar en tu backend
+    console.log('Árbol actualizado con drag-and-drop:', nuevoArbol);
+    // Aquí podrías emitir por socket o guardar en tu backend
 }
 
 const addTextSize = () => {
@@ -413,18 +439,18 @@ const addinputNode = (valor = "text", size = { x: 80, y: 30 }, text = "input", p
 const deleteNode = () => {
     const respuesta = diagramManager.deleteSelectedNode();
 
-    eliminarNodoDelArbol(arbolJerarquico,respuesta.data.key);
-    JSON.stringify(arbolJerarquico.value, null, 2)
-    
+    eliminarNodoDelArbol(arbolJerarquico, respuesta.data.key);
+    // JSON.stringify(arbolJerarquico.value, null, 2)
+
 
 };
-const addText = (tipo = "text", text = "Nuevo Texto") => {
-    const newNodeData =diagramManager.addTextNode(tipo, text);
+const addText = (tipo = "texto", text = "Nuevo Texto") => {
+    const newNodeData = diagramManager.addTextNode(tipo, text);
     const json = diagramManager.saveDiagram();
     emitir(json);
 
     const nuevoNodo = {
-        text: 'text',
+        text: 'texto',
         key: newNodeData.key,
         children: []
     };
@@ -445,8 +471,10 @@ const addText = (tipo = "text", text = "Nuevo Texto") => {
 const emitir = (json) => {
     socket.emit("add-node", {
         codigo: codigoSala.value,
-        diagrama: json
+        diagrama: [json, arbolJerarquico.value]
     });
+
+    // console.log(json)
 }
 
 function updateNodeType() {
@@ -456,12 +484,20 @@ function updateNodeType() {
 
         if (selectedNode.value.type === 'select') {
             diagramManager.diagram.model.setDataProperty(selectedNode.value, 'opciones', [...valores.value]);
+            // const json = diagramManager.saveDiagram();
+            // // console.log(json, arbolJerarquico.value );        
+            // emitir(json)
+            console.log('if true');
+
         } else {
             valores.value = [''];
+            console.log('if false');
+
             diagramManager.diagram.model.setDataProperty(selectedNode.value, 'opciones', []);
         }
         diagramManager.diagram.model.commitTransaction('update type')
     }
+
 }
 
 

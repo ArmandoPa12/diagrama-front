@@ -1,5 +1,5 @@
   <template>
-    <form @submit.prevent="handleSubmit">
+    <!-- <form @submit.prevent="handleSubmit">
       <div class="mb-3">
         <label for="imagen" class="form-label">Seleccionar imagen</label>
         <input type="file" id="imagen" class="form-control" accept="image/*" @change="handleFileChange" />
@@ -22,12 +22,17 @@
       <p v-if="error" class="mt-2 text-danger">{{ error }}</p>
     </form>
 
-    
 
+    
+    
     <div>
       <div ref="diagramContainer" style="width: 100%; height: 500px; border: 1px solid black"></div>
-    </div>
+    </div> -->
+  
+    <p>aqui van los ejemplos</p>
+    
   </template>
+
 
 
 <script setup>
