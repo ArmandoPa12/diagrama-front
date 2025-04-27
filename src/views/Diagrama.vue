@@ -7,20 +7,9 @@
             <p>es colaborador</p>
         </div>
 
-        <!-- <button @click="addCustomNode">Agregar nodo</button>
-        <button @click="addinputNode">Agregar input</button>
-        <button @click="addText">Agregar Texto</button>
-        <button @click="addSelect">Agregar select</button>
-        <button @click="deleteNode">Eliminar Nodo</button>
-        <input type="number" v-model="fontSize" id="fontSize">
-        <button @click="addTextSize">size Texto</button>
-        <input type="color" v-model="color" id="colorPicker">
-        <button @click="changeColorButton">Cambiar Color</button>
-        <div class="color-grid">
-            <div v-for="(savedColor, index) in colorHistory" :key="index" :style="{ backgroundColor: savedColor }"
-                @click="color = savedColor">
-            </div>
-        </div>  -->
+        <div v-if="tituloProyecto">
+            <h2>{{ tituloProyecto }}</h2>
+        </div>
 
         <div v-if="esAnfitrion">
             <input v-model="colaborador" placeholder="Usuario a invitar" />
@@ -30,14 +19,9 @@
                 data-bs-html="true" data-bs-trigger="hover" data-bs-placement="right">
                 Colaboradores
             </button>
-            <!-- <button @click="guardarDiagrama">Guardar</button>
 
-            <p>{{ mensaje }}</p>
-            <h3>Colaboradores:</h3>
-            <ul>
-                <li v-for="col in colaboradores" :key="col.usuario">{{ col.usuario }}</li>
-            </ul> -->
         </div>
+        <button @click="generarPaquete">Generar paquete</button>
         <div class="container-fluid">
             <div class="row">
                 <div class="col-1 p-3 bg-light border-end">
@@ -49,26 +33,27 @@
                             </button>
 
                             <div class="collapse" id="home-collapse" style="">
-                                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                                <ul class="btn-toggle-nav list-unstyled fw-normal p-1 small">
                                     <li><button @click="addCustomNode('lienzo')"
-                                            class="link-dark rounded">Lienzo</button></li>
+                                            class="link-dark rounded p-1">Lienzo</button></li>
                                     <li><button @click="addinputNode('input')" class="link-dark rounded">Input</button>
                                     </li>
-                                    <li><button @click="addText()" class="link-dark rounded">Text</button></li>
-                                    <li><button @click="addinputNode('button', {  x: 130, y: 150 })"
-                                        class="link-dark rounded">Boton</button></li>
-                                    <li><button @click="addText('link', 'link')" class="link-dark rounded">link</button>
+                                    <li><button @click="addText()" class="p-1 link-dark rounded">Text</button></li>
+                                    <li><button @click="addinputNode('button', { x: 130, y: 150 })"
+                                            class="link-dark rounded p-1">Boton</button></li>
+                                    <li><button @click="addText('link', 'link')"
+                                            class="p-1 link-dark rounded">link</button>
                                     </li>
                                     <li><button @click="addCustomNode('nav', { x: 1160, y: 70 })"
-                                            class="link-dark rounded">Nav</button></li>
+                                            class="link-dark rounded p-1">Nav</button></li>
                                     <li><button @click="addCustomNode('form', { x: 200, y: 300 })"
-                                            class="link-dark rounded">Formulario</button></li>
+                                            class="link-dark rounded p-1">Formulario</button></li>
                                     <li><button @click="addCustomNode('list', { x: 130, y: 150 })"
-                                            class="link-dark rounded">Lista</button></li>
+                                            class="link-dark rounded p-1">Lista</button></li>
                                     <li><button @click="addCustomNode('table', { x: 730, y: 390 })"
-                                            class="link-dark rounded">Tabla</button></li>
+                                            class="link-dark rounded p-1">Tabla</button></li>
                                     <li><button @click="addCustomNode('div', { x: 210, y: 60 })"
-                                            class="link-dark rounded">Div</button></li>
+                                            class="link-dark rounded p-1">Div</button></li>
                                 </ul>
                             </div>
 
@@ -125,29 +110,23 @@
                                     class="link-dark rounded">+Submit</button>
                             </div>
                             <div v-if="selectedNode.type === 'table'">
-                                <button @click="addText('title', 'title')" class="link-dark rounded me-2">Titulo+</button>
+                                <button @click="addText('title', 'title')"
+                                    class="link-dark rounded me-2">Titulo+</button>
                                 <button @click="addText('body', 'body')" class="link-dark rounded">body+</button>
                             </div>
                         </div>
                     </ul>
                 </div>
                 <div class="col-2 p-3">
-                        <!-- <div v-if="arbolJerarquico">
-                            {{ arbolJerarquico }}
-                            <pre>{{ formatearArbol(arbolJerarquico) }}</pre>
-                        </div> -->
-
-                        <div v-if="arbolJerarquico" class="arbol-visual">
-    <pre>{{ formatearArbol(arbolJerarquico) }}</pre>
-  </div>
+                    <div v-if="arbolJerarquico" class="arbol-visual">
+                        <pre>{{ formatearArbol(arbolJerarquico) }}</pre>
+                    </div>
                 </div>
                 <div class="col-9 p-3">
                     <div ref="diagramRef" style="width: 100%; height: 670px; border: 1px solid #ccc"></div>
                 </div>
             </div>
         </div>
-
-        <!-- <div ref="diagramRef" style="width:100%; height:500px; border: 1px solid #ccc;"></div> -->
 
 
     </div>
@@ -181,13 +160,13 @@
 }
 
 .arbol-visual {
-  font-family: monospace;
-  text-align: left;
-  white-space: pre;
-  background-color: #f8f8f8;
-  padding: 10px;
-  border-radius: 4px;
-  overflow-x: auto;
+    font-family: monospace;
+    text-align: left;
+    white-space: pre;
+    background-color: #f8f8f8;
+    padding: 10px;
+    border-radius: 4px;
+    overflow-x: auto;
 }
 </style>
 
@@ -202,7 +181,9 @@ import { useSalaStore } from '@/stores/salas';
 import { io } from "socket.io-client";
 import * as bootstrap from 'bootstrap'
 import { agregarNodoAlArbol, eliminarNodoDelArbol } from '@/auxiliar/Arbol.js';
-// import TreeView from "@/components/TreeView.vue";
+import { extraerNodosAngular, generarComponentTs, armarArbolConDatos, crearElementoDesdeData, generarRoutingTs, generarModuleTs } from "../class/convertir/TypeScritp.js";
+import JSZip from 'jszip';
+
 
 
 const route = useRoute()
@@ -229,6 +210,7 @@ const colorHistory = ref([]);
 const selectedType = ref('Ninguno')
 const selectedNode = ref(null)
 const valores = ref([''])
+const tituloProyecto = ref('');
 let popoverInstance = null
 const arbolJerarquico = ref();
 // websocket
@@ -272,8 +254,7 @@ onMounted(async () => {
         socket.on("load-diagram", (data) => {
 
             if (inicializado) return;
-            console.log(data.payload);
-
+            tituloProyecto.value = data.data.nombre || '';
 
             const arbol = JSON.parse(data.payload)[1]
             const diagramaRaw = JSON.parse(data.payload)[0]
@@ -323,20 +304,105 @@ onBeforeUnmount(() => {
 
     generarImagenDelDiagrama();
 })
-const formatearArbol = (nodo, nivel = 0) => {
-  if (!nodo) return '';
-  
-  const indentacion = '    '.repeat(nivel);
-  const flechas = nivel > 0 ? '-->' : '';
-  let resultado = `${indentacion}${flechas}${nodo.text}\n`;
-  
-  if (nodo.children && nodo.children.length > 0) {
-    for (const hijo of nodo.children) {
-      resultado += formatearArbol(hijo, nivel + 1);
+
+
+const generarPaquete = () => {
+    console.log('paquete generado');
+    const a = diagramManager.saveDiagram();
+    const raw = JSON.parse(a);
+    const nodosOrdenados = armarArbolConDatos(raw.nodeDataArray, arbolJerarquico.value);
+    const hijos = extraerNodosAngular(nodosOrdenados);
+
+    // aqui tenemos el html
+    const html = crearElementoDesdeData(nodosOrdenados);
+    // aqui tenemos el comoponente
+    const componente = generarComponentTs(hijos, tituloProyecto.value);
+    //aqui van los modulos
+    const modulos = generarModuleTs(tituloProyecto.value);
+    // aqui enemos el routin
+    const routing = generarRoutingTs(tituloProyecto.value);
+
+
+
+    // console.log(html.render());
+    // console.log(componente);
+    // console.log(routing);
+    // console.log(modulos);
+
+    const nombreBase = tituloProyecto.value
+    const archivos = [
+        { nombre: nombreBase + '.component.ts', contenido: componente },
+        { nombre: nombreBase + '.component.html', contenido: html.render() },
+        { nombre: nombreBase + '.module.ts', contenido: modulos },
+        { nombre: nombreBase + '.component.css', contenido: '' },
+        { nombre: nombreBase + '-routing.module.ts', contenido: routing },
+    ];
+
+    generarZip(nombreBase, archivos);
+    // descargarArchivo(nombreBase + '.component.html', html.render());
+    // descargarArchivo(nombreBase + '.component.css', '');
+
+    // descargarArchivo(nombreBase + '.component.ts', componente);
+    // descargarArchivo(nombreBase + '.module.ts', modulos);
+    // descargarArchivo(nombreBase + '-routing.module.ts', routing);
+
+
+
+}
+
+async function generarZip(nombreProyecto, archivos) {
+    const zip = new JSZip();
+
+    // Agregamos cada archivo al ZIP
+    for (const archivo of archivos) {
+        // archivo.nombre -> nombre dentro del ZIP
+        // archivo.contenido -> contenido del archivo
+        zip.file(archivo.nombre, archivo.contenido);
     }
-  }
-  
-  return resultado;
+
+    // Generar el zip como blob
+    const contenidoZip = await zip.generateAsync({ type: 'blob' });
+
+    // Crear un enlace para descargarlo
+    const enlace = document.createElement('a');
+    enlace.href = URL.createObjectURL(contenidoZip);
+    enlace.download = `${nombreProyecto}.zip`;
+    enlace.style.display = 'none';
+
+    document.body.appendChild(enlace);
+    enlace.click();
+
+    // Limpieza
+    document.body.removeChild(enlace);
+}
+
+function descargarArchivo(nombreArchivo, contenido) {
+    const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nombreArchivo;
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+}
+
+
+const formatearArbol = (nodo, nivel = 0) => {
+    if (!nodo) return '';
+
+    const indentacion = '    '.repeat(nivel);
+    const flechas = nivel > 0 ? '-->' : '';
+    let resultado = `${indentacion}${flechas}${nodo.text}\n`;
+
+    if (nodo.children && nodo.children.length > 0) {
+        for (const hijo of nodo.children) {
+            resultado += formatearArbol(hijo, nivel + 1);
+        }
+    }
+
+    return resultado;
 };
 
 const generarContenidoHTML = () => {
@@ -350,7 +416,6 @@ const generarContenidoHTML = () => {
 function agregarCampo() {
     if (valores.value[valores.value.length - 1] !== '') {
         valores.value.push('')
-
     }
 }
 
@@ -376,10 +441,9 @@ const getMiembros = async () => {
 
 
 }
-function guardarCambios(nuevoArbol) {
-    console.log('Árbol actualizado con drag-and-drop:', nuevoArbol);
-    // Aquí podrías emitir por socket o guardar en tu backend
-}
+// function guardarCambios(nuevoArbol) {
+//     console.log('Árbol actualizado con drag-and-drop:', nuevoArbol);
+// }
 
 const addTextSize = () => {
     const newNodeData = diagramManager.changeNodeTextFontZise(fontSize.value)
@@ -525,25 +589,25 @@ const saveColor = () => {
     }
 };
 
-const guardarDiagrama = async () => {
-    if (diagramManager) {
-        jsonData.value = diagramManager.saveDiagram();
-        console.log(jsonData.value);
-        try {
-            await proyecto.updateProyecto(
-                { nombre: "prueba1", diagrama: jsonData.value },
-                idProyecto.value);
-            console.log('termiando');
+// const guardarDiagrama = async () => {
+//     if (diagramManager) {
+//         jsonData.value = diagramManager.saveDiagram();
+//         console.log(jsonData.value);
+//         try {
+//             await proyecto.updateProyecto(
+//                 { nombre: "prueba1", diagrama: jsonData.value },
+//                 idProyecto.value);
+//             console.log('termiando');
 
-            socket.emit("save-diagram", {
-                codigo: codigoSala.value,
-                diagrama: jsonData.value
-            });
-        } catch (error) {
-            console.log(error);
-        }
-    }
-}
+//             socket.emit("save-diagram", {
+//                 codigo: codigoSala.value,
+//                 diagrama: jsonData.value
+//             });
+//         } catch (error) {
+//             console.log(error);
+//         }
+//     }
+// }
 
 // const cargarDiagrama = () => {
 //     if (diagramManager && jsonData.value) {

@@ -2,7 +2,7 @@ import { Base } from "./Base.js";
 import { Form } from "./Form.js";
 import { Lienzo } from "./Lienzo.js";
 import { Table } from "./Table.js";
-import { extraerNodosAngular, generarComponentTs } from "./TypeScritp.js";
+import { extraerNodosAngular, generarComponentTs, generarModuleTs, generarRoutingTs } from "./TypeScritp.js";
 
 
 
@@ -42,19 +42,46 @@ function armarArbolConDatos(nodos, jerarquia) {
 
 const data = ["{ \"class\": \"GraphLinksModel\",\n  \"nodeDataArray\": [\n{\"key\":1,\"category\":\"custom\",\"type\":\"lienzo\",\"loc\":\"0 0\",\"color\":\"lightblue\",\"size\":\"1160 640\",\"label\":\"\"},\n{\"key\":2,\"category\":\"custom\",\"type\":\"form\",\"loc\":\"125 75\",\"color\":\"lightblue\",\"size\":\"330 490\",\"label\":\"\"},\n{\"key\":3,\"category\":\"text\",\"loc\":\"205 75\",\"text\":\"LOGIN\",\"fontSize\":10,\"type\":\"texto\"},\n{\"key\":4,\"category\":\"text\",\"loc\":\"125 115\",\"text\":\"username\",\"fontSize\":10,\"type\":\"texto\"},\n{\"key\":5,\"category\":\"rectangleTextNode\",\"loc\":\"165 165\",\"text\":\"username\",\"color\":\"lightgreen\",\"size\":\"80 30\",\"type\":\"text\",\"opciones\":[],\"validation\":[]},\n{\"key\":6,\"category\":\"text\",\"loc\":\"125 195\",\"text\":\"password\",\"fontSize\":10,\"type\":\"texto\"},\n{\"key\":7,\"category\":\"rectangleTextNode\",\"loc\":\"165 245\",\"text\":\"password\",\"color\":\"lightgreen\",\"size\":\"80 30\",\"type\":\"password\",\"opciones\":[],\"validation\":[]},\n{\"key\":8,\"category\":\"text\",\"loc\":\"125 285\",\"text\":\"email\",\"fontSize\":10,\"type\":\"texto\"},\n{\"key\":9,\"category\":\"rectangleTextNode\",\"loc\":\"155 335\",\"text\":\"email\",\"color\":\"lightgreen\",\"size\":\"80 30\",\"type\":\"email\",\"opciones\":[],\"validation\":[]},\n{\"key\":10,\"category\":\"rectangleTextNode\",\"loc\":\"175 495\",\"text\":\"enviar\",\"color\":\"lightgreen\",\"size\":\"80 30\",\"type\":\"submit\",\"opciones\":[],\"validation\":[]},\n{\"key\":11,\"category\":\"text\",\"loc\":\"115 385\",\"text\":\"Seleccionar letra\",\"fontSize\":10,\"type\":\"texto\"},\n{\"key\":12,\"category\":\"rectangleTextNode\",\"loc\":\"155 425\",\"text\":\"letra\",\"color\":\"lightgreen\",\"size\":\"80 30\",\"type\":\"select\",\"opciones\":[\"a\",\"b\",\"c\",\"d\"],\"validation\":[]},\n{\"key\":13,\"category\":\"custom\",\"type\":\"div\",\"loc\":\"515 115\",\"color\":\"lightblue\",\"size\":\"210 440\",\"label\":\"\"},\n{\"key\":14,\"category\":\"custom\",\"type\":\"list\",\"loc\":\"555 155\",\"color\":\"lightblue\",\"size\":\"130 150\",\"label\":\"\"},\n{\"key\":15,\"category\":\"custom\",\"type\":\"list\",\"loc\":\"555 365\",\"color\":\"lightblue\",\"size\":\"130 150\",\"label\":\"\"},\n{\"key\":16,\"category\":\"text\",\"loc\":\"545 145\",\"text\":\"Nuevo Texto1\",\"fontSize\":10,\"type\":\"texto\"},\n{\"key\":17,\"category\":\"text\",\"loc\":\"545 205\",\"text\":\"Nuevo Texto2\",\"fontSize\":10,\"type\":\"texto\"},\n{\"key\":18,\"category\":\"text\",\"loc\":\"545 355\",\"text\":\"Nuevo Texto3\",\"fontSize\":10,\"type\":\"texto\"},\n{\"key\":19,\"category\":\"text\",\"loc\":\"545 425\",\"text\":\"4\",\"fontSize\":10,\"type\":\"texto\"},\n{\"key\":20,\"category\":\"custom\",\"type\":\"table\",\"loc\":\"795 135\",\"color\":\"lightblue\",\"size\":\"310 390\",\"label\":\"\"},\n{\"key\":21,\"category\":\"text\",\"loc\":\"825 155\",\"text\":\"title1\",\"fontSize\":10,\"type\":\"title\"},\n{\"key\":22,\"category\":\"text\",\"loc\":\"945 155\",\"text\":\"title2\",\"fontSize\":10,\"type\":\"title\"},\n{\"key\":23,\"category\":\"text\",\"loc\":\"825 245\",\"text\":\"body1\",\"fontSize\":10,\"type\":\"body\"},\n{\"key\":24,\"category\":\"text\",\"loc\":\"825 375\",\"text\":\"body2\",\"fontSize\":10,\"type\":\"body\"},\n{\"key\":25,\"category\":\"custom\",\"type\":\"nav\",\"loc\":\"0 0\",\"color\":\"lightblue\",\"size\":\"1160 70\",\"label\":\"\"},\n{\"key\":26,\"category\":\"rectangleTextNode\",\"loc\":\"175 15\",\"text\":\"home\",\"color\":\"lightgreen\",\"size\":\"80 30\",\"type\":\"button\",\"opciones\":[],\"validation\":[]},\n{\"key\":27,\"category\":\"rectangleTextNode\",\"loc\":\"315 15\",\"text\":\"services\",\"color\":\"lightgreen\",\"size\":\"80 30\",\"type\":\"button\",\"opciones\":[],\"validation\":[]},\n{\"key\":28,\"category\":\"rectangleTextNode\",\"loc\":\"815 575\",\"text\":\"pruebaA\",\"color\":\"lightgreen\",\"size\":\"130 150\",\"type\":\"button\",\"opciones\":[],\"validation\":[]},\n{\"key\":29,\"category\":\"rectangleTextNode\",\"loc\":\"955 575\",\"text\":\"pruebaB\",\"color\":\"lightgreen\",\"size\":\"130 150\",\"type\":\"button\",\"opciones\":[],\"validation\":[]}\n],\n  \"linkDataArray\": []}", { "text": "lienzo", "key": 1, "children": [{ "text": "form", "key": 2, "children": [{ "text": "texto", "key": 3, "children": [] }, { "text": "texto", "key": 4, "children": [] }, { "text": "input", "key": 5, "children": [] }, { "text": "texto", "key": 6, "children": [] }, { "text": "input", "key": 7, "children": [] }, { "text": "texto", "key": 8, "children": [] }, { "text": "input", "key": 9, "children": [] }, { "text": "submit", "key": 10, "children": [] }, { "text": "texto", "key": 11, "children": [] }, { "text": "input", "key": 12, "children": [] }] }, { "text": "div", "key": 13, "children": [{ "text": "list", "key": 14, "children": [{ "text": "texto", "key": 16, "children": [] }, { "text": "texto", "key": 17, "children": [] }] }, { "text": "list", "key": 15, "children": [{ "text": "texto", "key": 18, "children": [] }, { "text": "texto", "key": 19, "children": [] }] }] }, { "text": "table", "key": 20, "children": [{ "text": "texto", "key": 21, "children": [] }, { "text": "texto", "key": 22, "children": [] }, { "text": "texto", "key": 23, "children": [] }, { "text": "texto", "key": 24, "children": [] }] }, { "text": "nav", "key": 25, "children": [{ "text": "button", "key": 26, "children": [] }, { "text": "button", "key": 27, "children": [] }] }, { "text": "button", "key": 28, "children": [] }, { "text": "button", "key": 29, "children": [] }] }]
 
-
+const nombre = 'exampleNuevo';
 
 const rawDiagramString = data[0];
 
 const raw = JSON.parse(rawDiagramString);
 
 const treeStructure = data[1];
+const nodosOrdenados = armarArbolConDatos(raw.nodeDataArray, treeStructure);
+const recopilacion = extraerNodosAngular(nodosOrdenados);
+
+
+
+const html = crearElementoDesdeData(nodosOrdenados);
+// aqui tenemos el comoponente
+const componente = generarComponentTs(recopilacion, nombre);
+//aqui van los modulos
+const modulos = generarModuleTs(nombre);
+// aqui enemos el routin
+const routing = generarRoutingTs(nombre);
+
+console.log('--------------COMPONENTE--------------');
+console.log(componente);
+console.log('------------HTML----------------');
+console.log(html.render());
+console.log('-----------MODULO-----------------');
+console.log(modulos);
+console.log('--------------ROUTING--------------');
+console.log(routing);
+
+
+
+
+
+// console.log(raw);
 
 // console.log(JSON.stringify(nodosOrdenados, null, 2));
 
-const nodosOrdenados = armarArbolConDatos(raw.nodeDataArray, treeStructure);
+// const nodosOrdenados = armarArbolConDatos(raw.nodeDataArray, treeStructure);
 
-console.log(JSON.stringify(nodosOrdenados, null, 2));
+// // console.log(JSON.stringify(nodosOrdenados, null, 2));
 
 function crearElementoDesdeData(data) {
     switch (data.type) {
@@ -90,12 +117,14 @@ function crearElementoDesdeData(data) {
     }
 }
 
-const html = crearElementoDesdeData(nodosOrdenados);
+// const html = crearElementoDesdeData(nodosOrdenados);
 
-const recopilacion = extraerNodosAngular(nodosOrdenados);
-console.log(JSON.stringify(recopilacion, null, 2));
-const TypeScritp = generarComponentTs(recopilacion);
-console.log(TypeScritp);
+// const recopilacion = extraerNodosAngular(nodosOrdenados);
+// // console.log(JSON.stringify(recopilacion, null, 2));
+// const TypeScritp = generarComponentTs(recopilacion);
 
 
-console.log(html.render());
+// console.log(TypeScritp);
+
+
+// console.log(html.render());
