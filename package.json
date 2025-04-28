@@ -9,14 +9,26 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@he-tree/vue": "^2.9.4",
+    "axios": "^1.8.4",
+    "bootstrap": "^5.3.5",
+    "dotenv": "^16.5.0",
     "gojs": "^3.0.21",
+    "jszip": "^3.10.1",
+    "moment": "^2.30.1",
     "pinia": "^3.0.1",
     "project-sw1": "file:",
+    "socket.io-client": "^4.8.1",
     "vue": "^3.5.13",
+    "vue-drag-tree": "^1.1.9",
+    "vue-draggable-tree": "^1.1.6",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.3",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.4",
     "vite": "^6.2.4",
     "vite-plugin-vue-devtools": "^7.7.2"
   }
