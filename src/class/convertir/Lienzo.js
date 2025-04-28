@@ -59,7 +59,6 @@ export class Lienzo extends Base {
     }
 
     instanciarElemento(data) {
-        console.log('lienzo-----', data.type);
 
         switch (data.type) {
             case 'texto':

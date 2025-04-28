@@ -7,9 +7,19 @@
             <p>es colaborador</p>
         </div>
 
-        <div v-if="tituloProyecto">
-            <h2>{{ tituloProyecto }}</h2>
+        <div class="row row-cols-auto p-2" >
+            <div class="col">
+                <button type="button" @click="goBack" class="btn btn-primary me-2"><</button>
+            </div>
+
+            <div class="col">
+                <div v-if="tituloProyecto">
+                    <h3>Proyecto: {{ tituloProyecto }}</h3>
+                </div>
+
+            </div>
         </div>
+
 
         <div v-if="esAnfitrion">
             <input v-model="colaborador" placeholder="Usuario a invitar" />
@@ -173,7 +183,7 @@
 <script setup>
 
 import { ref, onMounted, onBeforeUnmount, compile, watch } from "vue";
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { DiagramManager } from "../class/DiagramManager.js";
 import { useProyectosStore } from '@/stores/proyectos';
 import { useAuthStore } from '@/stores/auth';
@@ -187,6 +197,7 @@ import JSZip from 'jszip';
 
 
 const route = useRoute()
+const router = useRouter()
 const codigoSala = ref(route.params.codigo);
 const idProyecto = ref(Number(route.params.id));
 const esAnfitrion = ref(!!route.params.id);
@@ -322,13 +333,6 @@ const generarPaquete = () => {
     // aqui enemos el routin
     const routing = generarRoutingTs(tituloProyecto.value);
 
-
-
-    // console.log(html.render());
-    // console.log(componente);
-    // console.log(routing);
-    // console.log(modulos);
-
     const nombreBase = tituloProyecto.value
     const archivos = [
         { nombre: nombreBase + '.component.ts', contenido: componente },
@@ -339,55 +343,24 @@ const generarPaquete = () => {
     ];
 
     generarZip(nombreBase, archivos);
-    // descargarArchivo(nombreBase + '.component.html', html.render());
-    // descargarArchivo(nombreBase + '.component.css', '');
-
-    // descargarArchivo(nombreBase + '.component.ts', componente);
-    // descargarArchivo(nombreBase + '.module.ts', modulos);
-    // descargarArchivo(nombreBase + '-routing.module.ts', routing);
-
-
 
 }
 
 async function generarZip(nombreProyecto, archivos) {
     const zip = new JSZip();
 
-    // Agregamos cada archivo al ZIP
     for (const archivo of archivos) {
-        // archivo.nombre -> nombre dentro del ZIP
-        // archivo.contenido -> contenido del archivo
         zip.file(archivo.nombre, archivo.contenido);
     }
-
-    // Generar el zip como blob
     const contenidoZip = await zip.generateAsync({ type: 'blob' });
-
-    // Crear un enlace para descargarlo
     const enlace = document.createElement('a');
     enlace.href = URL.createObjectURL(contenidoZip);
     enlace.download = `${nombreProyecto}.zip`;
     enlace.style.display = 'none';
-
     document.body.appendChild(enlace);
     enlace.click();
-
-    // Limpieza
     document.body.removeChild(enlace);
 }
-
-function descargarArchivo(nombreArchivo, contenido) {
-    const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = nombreArchivo;
-    a.click();
-
-    window.URL.revokeObjectURL(url);
-}
-
 
 const formatearArbol = (nodo, nivel = 0) => {
     if (!nodo) return '';
@@ -434,16 +407,12 @@ const getMiembros = async () => {
             proyectoId: idProyecto.value
         })
         colaboradores.value = lista;
-        console.log(lista);
     } catch (error) {
         console.log(error)
     }
 
 
 }
-// function guardarCambios(nuevoArbol) {
-//     console.log('Árbol actualizado con drag-and-drop:', nuevoArbol);
-// }
 
 const addTextSize = () => {
     const newNodeData = diagramManager.changeNodeTextFontZise(fontSize.value)
@@ -461,16 +430,9 @@ const addCustomNode = (valor, size = { x: 1160, y: 640 }, pos = { x: 0, y: 0 }) 
         children: []
     };
     if (!selectedNode.value) {
-        // No hay nodo seleccionado, lo tomamos como raíz
         agregarNodoAlArbol(arbolJerarquico, null, nuevoNodo);
-        console.log("Nodo raíz creado:", JSON.stringify(arbolJerarquico.value, null, 2));
     } else {
-        const agregado = agregarNodoAlArbol(arbolJerarquico, selectedNode.value.key, nuevoNodo);
-        if (agregado) {
-            console.log("Nodo agregado como hijo:", JSON.stringify(arbolJerarquico.value, null, 2));
-        } else {
-            console.warn("No se encontró el nodo padre para agregar el hijo.");
-        }
+        agregarNodoAlArbol(arbolJerarquico, selectedNode.value.key, nuevoNodo);
     }
 
     emitir(json);
@@ -486,16 +448,9 @@ const addinputNode = (valor = "text", size = { x: 80, y: 30 }, text = "input", p
         children: []
     };
     if (!selectedNode.value) {
-        // No hay nodo seleccionado, lo tomamos como raíz
         agregarNodoAlArbol(arbolJerarquico, null, nuevoNodo);
-        console.log("Nodo raíz creado:", JSON.stringify(arbolJerarquico.value, null, 2));
     } else {
-        const agregado = agregarNodoAlArbol(arbolJerarquico, selectedNode.value.key, nuevoNodo);
-        if (agregado) {
-            console.log("Nodo agregado como hijo:", JSON.stringify(arbolJerarquico.value, null, 2));
-        } else {
-            console.warn("No se encontró el nodo padre para agregar el hijo.");
-        }
+        agregarNodoAlArbol(arbolJerarquico, selectedNode.value.key, nuevoNodo);
     }
     emitir(json);
 };
@@ -519,16 +474,9 @@ const addText = (tipo = "texto", text = "Nuevo Texto") => {
         children: []
     };
     if (!selectedNode.value) {
-        // No hay nodo seleccionado, lo tomamos como raíz
         agregarNodoAlArbol(arbolJerarquico, null, nuevoNodo);
-        console.log("Nodo raíz creado:", JSON.stringify(arbolJerarquico.value, null, 2));
     } else {
-        const agregado = agregarNodoAlArbol(arbolJerarquico, selectedNode.value.key, nuevoNodo);
-        if (agregado) {
-            console.log("Nodo agregado como hijo:", JSON.stringify(arbolJerarquico.value, null, 2));
-        } else {
-            console.warn("No se encontró el nodo padre para agregar el hijo.");
-        }
+        agregarNodoAlArbol(arbolJerarquico, selectedNode.value.key, nuevoNodo);
     }
 };
 
@@ -539,6 +487,10 @@ const emitir = (json) => {
     });
 
     // console.log(json)
+}
+
+const goBack =() => {
+    router.back();
 }
 
 function updateNodeType() {

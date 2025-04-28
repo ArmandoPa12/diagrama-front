@@ -1,7 +1,7 @@
 <template>
   <div>
 
-      <div class="row">
+      <div class="row p-3">
         <div class="col">
           <div class="input-group mb-3">
             <input type="text" class="form-control" v-model="nombreProyecto" placeholder="Nuevo proyecto" aria-label="Recipient's username"

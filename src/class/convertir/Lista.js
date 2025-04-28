@@ -9,7 +9,6 @@ export class Lista extends Base {
         }
 
         const items = this.children.map(child => {
-            // Si tus objetos tienen `.text`, usá eso. Si tienen `.render()`, podés cambiarlo.
             return `<li class="list-group-item">${child.text}</li>`;
         }).join('');
 

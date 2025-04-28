@@ -28,6 +28,25 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
+    const register = async(datos) => {
+        try {
+            const res = await axios.post('api/users/register', datos)
+
+            // console.log(res.data);
+            user.value = res.data.user;
+            // // userId.value = res.data.
+            token.value = res.data.token;
+
+            localStorage.setItem('user', JSON.stringify(res.data.user))
+            localStorage.setItem('token', res.data.token)
+
+            axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
 
     const logout = () => {
         user.value = null
@@ -51,5 +70,5 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
-    return { user, token, login, logout, isAuthenticated, init }
+    return { user, token, login, logout, isAuthenticated, init, register }
 })

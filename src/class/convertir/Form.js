@@ -8,7 +8,6 @@ import { Text } from "./Text.js";
 
 export class Form extends Base {
     render() {
-        const elementosValidos = ['input', 'div', 'submit', 'link', 'text','texto','number'];
 
         const hijosFiltrados = this.children.sort((a, b) => {
             const aY = parseFloat(a.loc.split(' ')[1]);
@@ -39,18 +38,9 @@ export class Form extends Base {
         if (currentRow.length) rows.push(currentRow);
 
         const htmlRows = rows.map(row => {
-            // Ordenar por X antes de procesar columnas
-            // row.sort((a, b) => {
-            //     const aX = parseFloat(a.loc.split(' ')[0]);
-            //     const bX = parseFloat(b.loc.split(' ')[0]);
-            //     return aX - bX;
-            // });
-        
             const cols = row.map(child => {
                 const instancia = this.instanciarElemento(child);
                 return instancia ? instancia.render(): ''
-
-                // return `<div class="col">${instancia ? instancia.render() : ''}</div>`;
             });
         
             return `<div class="row">${cols.join('\n')}</div>`;

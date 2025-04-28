@@ -8,6 +8,7 @@ import Socket from '@/views/socket.vue'
 import Diagrama from '@/views/Diagrama.vue'
 import Colaboracion from '@/views/Colaboracion.vue'
 import ConversionView from '@/views/ConversionView.vue'
+import RegisterView from '@/views/RegisterView.vue'
 
 const router = createRouter({
     history: createWebHistory(
@@ -16,6 +17,11 @@ const router = createRouter({
             path: '/login',
             name: 'login',
             component: LoginView,
+        },
+        {
+            path: '/register',
+            name: 'register',
+            component: RegisterView,
         },
         {
             path: '/dashboard',
@@ -40,6 +46,7 @@ const router = createRouter({
                     component: Socket,
                     meta: { requiresAuth: true }
                 },
+
                 {
                     path: '/home-convert',
                     name: 'home-convert',

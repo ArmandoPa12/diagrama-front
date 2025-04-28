@@ -12,7 +12,7 @@
             <small>{{ auth.user?.usuario }}</small>
           </div>
 
-          <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+          <!-- <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
             <li>
               <RouterLink to="/" class="nav-link px-2">Home</RouterLink>
             </li>
@@ -34,7 +34,7 @@
             <li>
               <RouterLink to="/diagrama" class="nav-link px-2">Diagrama</RouterLink>
             </li>
-          </ul>
+          </ul> -->
 
           <div class="col-md-3 text-end">
             <button type="button" @click="logout" class="btn btn-outline-primary me-2">Log-out</button>

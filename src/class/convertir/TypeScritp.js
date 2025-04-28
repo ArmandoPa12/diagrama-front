@@ -165,9 +165,6 @@ export function generarComponentTs(data, nombreComponente = 'HolaComponent') {
       }
     }
   
-    editarElemento(elemento: any) {
-      this.formulario.patchValue(elemento);
-    }
   }
   `;
 

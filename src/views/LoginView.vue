@@ -18,18 +18,15 @@
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Entrar</button>
                 <p v-if="error" style="color: red">{{ error }}</p>
+                <div class="form-check d-flex justify-content m-5">
+
+                    <label class="form-check-label" for="form2Example3">
+                        crear cuenta <a href="/register">aqui</a>
+                    </label>
+                </div>
             </form>
         </div>
     </div>
-    <!-- <div>
-        <h1>Login</h1>
-        <form @submit.prevent="handleLogin">
-            <input v-model="username" placeholder="Usuario" />
-            <input v-model="password" type="password" placeholder="Contraseña" />
-            <button type="submit">Entrar</button>
-            <p v-if="error" style="color: red">{{ error }}</p>
-        </form>
-    </div> -->
 </template>
 
 <script setup>
@@ -50,7 +47,7 @@ const handleLogin = async () => {
         router.push('/dashboard')
     } catch (e) {
         error.value = e.response.data.error
-        
+
     }
 }
 </script>

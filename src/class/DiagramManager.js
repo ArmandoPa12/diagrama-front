@@ -7,9 +7,8 @@ export class DiagramManager {
         this.initialize(diagramContainer);
 
         this.diagram.addDiagramListener("ChangedSelection", (e) => {
-            const selectedNode = this.diagram.selection.first(); // Obtiene el primer nodo seleccionado
+            const selectedNode = this.diagram.selection.first();
             if (selectedNode instanceof go.Node) {
-                console.log("Nodo seleccionado:", selectedNode.data);
                 if (typeof onNodeSelectedCallback === 'function') {
                     onNodeSelectedCallback(selectedNode.data);
                 }
@@ -32,10 +31,10 @@ export class DiagramManager {
 
             // para texto
             text: new go.Node("Auto", {
-                    layerName: "Foreground", // Para que el texto siempre esté arriba
-                    selectable: true, // Permitir seleccionar y editar
-                    resizable: true, // Permitir redimensionar
-                    resizeObjectName: "TEXT" // El objeto a redimensionar es el texto
+                    layerName: "Foreground",
+                    selectable: true,
+                    resizable: true,
+                    resizeObjectName: "TEXT"
 
                 })
                 .bindTwoWay('location', 'loc', go.Point.parse, go.Point.stringify)
@@ -43,11 +42,11 @@ export class DiagramManager {
                     new go.TextBlock({
                         margin: 5,
                         name: "TEXT",
-                        font: "bold 12pt sans-serif", // Valor por defecto
-                        editable: true // Permite edición directa
+                        font: "bold 12pt sans-serif",
+                        editable: true
                     })
                     .bindTwoWay("text", "text")
-                    .bind("font", "fontSize", (size) => `bold ${size || 12}pt sans-serif`) // Tamaño dinámico
+                    .bind("font", "fontSize", (size) => `bold ${size || 12}pt sans-serif`)
                     .bind("stroke", "textColor")
                 ),
 
@@ -56,7 +55,7 @@ export class DiagramManager {
                     resizable: true,
                     selectable: true,
                     resizeObjectName: 'mainShape',
-                    locationSpot: new go.Spot(0, 0, 30 / 1, 30 / 1) // Ajusta la posición según el tamaño de la celda
+                    locationSpot: new go.Spot(0, 0, 30 / 1, 30 / 1)
                 })
                 .bindTwoWay('location', 'loc', go.Point.parse, go.Point.stringify)
                 .add(
@@ -64,8 +63,8 @@ export class DiagramManager {
                         stroke: 'gray',
                         name: 'mainShape',
                         opacity: 0.7,
-                        minSize: new go.Size(30, 30), // Ajusta el tamaño mínimo
-                        desiredSize: new go.Size(30, 30) // Ajusta el tamaño deseado
+                        minSize: new go.Size(30, 30),
+                        desiredSize: new go.Size(30, 30)
                     })
                     .bind('fill', 'color')
                     .bindTwoWay('desiredSize', 'size', go.Size.parse, go.Size.stringify),
@@ -158,7 +157,6 @@ export class DiagramManager {
         });
 
 
-        // Configuración de la plantilla de nodos
         this.diagram.nodeTemplateMap.add("default", this.nodeTemplates.default);
         this.diagram.nodeTemplateMap.add("custom", this.nodeTemplates.custom);
         this.diagram.nodeTemplateMap.add("text", this.nodeTemplates.text);
@@ -178,14 +176,13 @@ export class DiagramManager {
             category: "custom",
             type: type,
             loc: `${position.x} ${position.y}`,
-            color: "lightblue", // Default color
-            size: `${size.x} ${size.y}`, // Size as string for custom node
-            label: "" // Label for custom node
+            color: "lightblue",
+            size: `${size.x} ${size.y}`,
+            label: ""
         };
 
         model.addNodeData(nodeData);
 
-        // console.log(nodeData);
         model.commitTransaction("add node");
         return nodeData;
 
@@ -197,7 +194,7 @@ export class DiagramManager {
 
         const textNode = {
             key: model.nodeDataArray.length + 1,
-            category: "text", // Usa la nueva plantilla de texto
+            category: "text",
             loc: `${position.x} ${position.y}`,
             text: text,
             fontSize: 10,
@@ -205,7 +202,6 @@ export class DiagramManager {
         };
 
         model.addNodeData(textNode);
-        console.log("Texto agregado:", textNode);
 
         model.commitTransaction("add text");
 
@@ -226,10 +222,8 @@ export class DiagramManager {
             opciones: [],
             validation: [],
         };
-        console.log(nodeData);
 
         model.addNodeData(nodeData);
-        // console.log("Nodo agregado:", nodeData);
 
         model.commitTransaction("add rectangle text node");
         return nodeData;
@@ -240,28 +234,25 @@ export class DiagramManager {
         model.startTransaction("add select node");
         model.addNodeData({
             key: model.nodeDataArray.length + 1,
-            category: "select", // coincide con el template arriba
+            category: "select",
             loc: `${position.x} ${position.y}`,
-            color: "lightyellow", // color de fondo
-            size: "100 60", // ancho x alto inicial
-            options: ["Opción 1"] // arranca con una única opción
+            color: "lightyellow",
+            size: "100 60",
+            options: ["Opción 1"]
         });
         model.commitTransaction("add select node");
     }
 
     deleteSelectedNode() {
         const model = this.diagram.model;
-        const selectedNode = this.diagram.selection.first(); // Obtener el nodo seleccionado
+        const selectedNode = this.diagram.selection.first();
 
         if (selectedNode instanceof go.Node) {
             model.startTransaction("delete node");
-            model.removeNodeData(selectedNode.data); // Eliminar el nodo del modelo
+            model.removeNodeData(selectedNode.data);
             model.commitTransaction("delete node");
-
-            console.log("Nodo eliminado:", selectedNode.data);
             return selectedNode
         } else {
-            console.log("No hay nodo seleccionado para eliminar");
             return null
         }
 
@@ -269,17 +260,13 @@ export class DiagramManager {
 
     changeNodeColor(newColor) {
         const model = this.diagram.model;
-        const selectedNode = this.diagram.selection.first(); // Obtener el nodo seleccionado
+        const selectedNode = this.diagram.selection.first();
 
-        console.log(selectedNode.data);
         if (selectedNode instanceof go.Node) {
             model.startTransaction("change color");
-            model.setDataProperty(selectedNode.data, "color", newColor); // Cambiar el color
+            model.setDataProperty(selectedNode.data, "color", newColor);
             model.commitTransaction("change color");
 
-            console.log("Color cambiado a:", newColor);
-        } else {
-            console.log("No hay nodo seleccionado para cambiar el color");
         }
     }
 
@@ -287,15 +274,11 @@ export class DiagramManager {
         const model = this.diagram.model;
         const selectedNode = this.diagram.selection.first();
 
-        console.log(selectedNode.data);
         if (selectedNode instanceof go.Node) {
             model.startTransaction("change text style");
-            model.setDataProperty(selectedNode.data, "fontSize", size); // Cambiar el color
+            model.setDataProperty(selectedNode.data, "fontSize", size);
             model.commitTransaction("change text style");
 
-            console.log("zise cambiado a:", size);
-        } else {
-            console.log("No hay nodo seleccionado para cambiar el size");
         }
     }
 
@@ -305,27 +288,23 @@ export class DiagramManager {
 
         if (selectedNode instanceof go.Node) {
             model.startTransaction("change text style");
-            model.setDataProperty(selectedNode.data, "textColor", color); // Cambiar el color
+            model.setDataProperty(selectedNode.data, "textColor", color);
             model.commitTransaction("change text style");
 
-            console.log("zise cambiado a:", color);
-        } else {
-            console.log("No hay nodo seleccionado para cambiar el color");
         }
 
     }
 
-    //para saber que nodo seleccione
+
     getSelectedNode() {
-            const selectedNode = this.diagram.selection.first(); // Obtener el primer nodo seleccionado
-            if (selectedNode instanceof go.Node) {
-                return selectedNode; // Devuelve el nodo si es de tipo go.Node
-            } else {
-                console.log("No hay nodo seleccionado");
-                return null; // Retorna null si no hay ningún nodo seleccionado
-            }
+        const selectedNode = this.diagram.selection.first();
+        if (selectedNode instanceof go.Node) {
+            return selectedNode;
+        } else {
+            return null;
         }
-        // Limpia el diagrama principal
+    }
+
     clearDiagram() {
         this.diagram.model.nodeDataArray = [];
         this.diagram.model.linkDataArray = [];
@@ -337,55 +316,13 @@ export class DiagramManager {
     }
 
     loadDiagram(json) {
-            try {
-                this.diagram.model = go.Model.fromJson(json);
-                console.log('modelo cargado');
-            } catch (error) {
-                console.log('error al cargar', error);
-            }
+        try {
+            this.diagram.model = go.Model.fromJson(json);
+        } catch (error) {
+            console.log('error al cargar', error);
         }
-        // setNodeMovedCallback(callback) {
-        //     // this.onNodeMoved = callback;
+    }
 
-    //     // let timeout = null;
-
-    //     // this.diagram.addDiagramListener("SelectionMoved", (e) => {
-    //     //     clearTimeout(timeout);
-
-    //     //     timeout = setTimeout(() => {
-    //     //         console.log("✅ Nodo movido, listo para enviar al servidor");
-    //     //         const json = this.saveDiagram();
-    //     //         callback(json);
-    //     //     }, 200);
-    //     // });
-
-    //     this.onDiagramChanged = callback;
-
-    //     let timeout = null;
-
-    //     this.diagram.model.addChangedListener((e) => {
-    //         const isNodeData = this.diagram.model.nodeDataArray.includes(e.object);
-    //         const isNodeInsertOrRemove = (
-    //             (e.change === go.ChangedEvent.Insert || e.change === go.ChangedEvent.Remove) &&
-    //             e.modelChange === "nodeDataArray"
-    //         );
-
-    //         const isNodePropertyChange = (
-    //             e.change === go.ChangedEvent.Property &&
-    //             e.modelChange === "" &&
-    //             isNodeData
-    //         );
-
-    //         if (isNodeInsertOrRemove || isNodePropertyChange) {
-    //             clearTimeout(timeout);
-    //             timeout = setTimeout(() => {
-    //                 const json = this.saveDiagram();
-    //                 console.log("✅ Cambio en el diagrama detectado y enviado:", json);
-    //                 callback(json);
-    //             }, 200);
-    //         }
-    //     });
-    // }
 
     setNodeMovedCallback(callback) {
         this.onDiagramChanged = callback;
@@ -407,7 +344,6 @@ export class DiagramManager {
     loadDiagram(json) {
         this.diagram.model = go.Model.fromJson(json);
 
-        // Registrar de nuevo el listener
         this._registerChangeListener();
     }
 
@@ -415,13 +351,13 @@ export class DiagramManager {
         if (!this.diagram) return null;
 
         const imageData = this.diagram.makeImageData({
-            background: "white", // color de fondo
-            scale: 1, // escala de la imagen
-            type: "image/png", // tipo MIME
-            imageFormat: "png" // formato de la imagen
+            background: "white",
+            scale: 1,
+            type: "image/png",
+            imageFormat: "png"
         });
 
-        return imageData; // devuelve una URL tipo data:image/png;base64,...
+        return imageData;
     }
 
 }
