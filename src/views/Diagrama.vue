@@ -249,7 +249,7 @@ onMounted(async () => {
     socket = io("http://localhost:3000");
 
     socket.on("connect", () => {
-        console.log("✅ Conectado al WebSocket");
+        console.log("Conectado al WebSocket");
 
         socket.emit("join-room", {
             codigo: codigoSala.value,
@@ -275,13 +275,8 @@ onMounted(async () => {
                 diagramManager = new DiagramManager(diagramRef.value, (nodeData) => {
                     selectedNode.value = nodeData
                 });
-
-                // console.log(rawDiagram);
                 diagramManager.loadDiagram(diagramaRaw);
-
-                // console.log("🧪 Llamando a setNodeMovedCallback");
                 diagramManager.setNodeMovedCallback((json) => {
-                    // console.log("🧪 Callback ejecutado con:", json);
                     socket.emit("save-diagram", {
                         codigo: codigoSala.value,
                         diagrama: [json, arbolJerarquico.value]
@@ -311,8 +306,6 @@ onBeforeUnmount(() => {
     if (socket && socket.readyState === WebSocket.OPEN) {
         socket.close();
     }
-    console.log('cerrado componente');
-
     generarImagenDelDiagrama();
 })
 
@@ -400,7 +393,6 @@ watch(selectedNode, (newNode) => {
     }
 });
 
-
 const getMiembros = async () => {
     try {
         const lista = await sala.miembrosSala({
@@ -457,12 +449,10 @@ const addinputNode = (valor = "text", size = { x: 80, y: 30 }, text = "input", p
 
 const deleteNode = () => {
     const respuesta = diagramManager.deleteSelectedNode();
-
     eliminarNodoDelArbol(arbolJerarquico, respuesta.data.key);
-    // JSON.stringify(arbolJerarquico.value, null, 2)
-
-
 };
+
+
 const addText = (tipo = "texto", text = "Nuevo Texto") => {
     const newNodeData = diagramManager.addTextNode(tipo, text);
     const json = diagramManager.saveDiagram();
@@ -485,8 +475,6 @@ const emitir = (json) => {
         codigo: codigoSala.value,
         diagrama: [json, arbolJerarquico.value]
     });
-
-    // console.log(json)
 }
 
 const goBack =() => {
@@ -500,9 +488,6 @@ function updateNodeType() {
 
         if (selectedNode.value.type === 'select') {
             diagramManager.diagram.model.setDataProperty(selectedNode.value, 'opciones', [...valores.value]);
-            // const json = diagramManager.saveDiagram();
-            // // console.log(json, arbolJerarquico.value );        
-            // emitir(json)
             console.log('if true');
 
         } else {
@@ -540,34 +525,6 @@ const saveColor = () => {
         colorHistory.value.push(color.value);
     }
 };
-
-// const guardarDiagrama = async () => {
-//     if (diagramManager) {
-//         jsonData.value = diagramManager.saveDiagram();
-//         console.log(jsonData.value);
-//         try {
-//             await proyecto.updateProyecto(
-//                 { nombre: "prueba1", diagrama: jsonData.value },
-//                 idProyecto.value);
-//             console.log('termiando');
-
-//             socket.emit("save-diagram", {
-//                 codigo: codigoSala.value,
-//                 diagrama: jsonData.value
-//             });
-//         } catch (error) {
-//             console.log(error);
-//         }
-//     }
-// }
-
-// const cargarDiagrama = () => {
-//     if (diagramManager && jsonData.value) {
-//         diagramManager.loadDiagram(jsonData.value);
-//     } else {
-//         console.log('no entro a cagrgar')
-//     }
-// }
 
 const unirse = async () => {
     if (!colaborador.value.trim()) {
@@ -622,7 +579,6 @@ function dataURLToFile(dataUrl, filename) {
     while (n--) {
         u8arr[n] = bstr.charCodeAt(n);
     }
-
     return new File([u8arr], filename, { type: mime });
 }
 

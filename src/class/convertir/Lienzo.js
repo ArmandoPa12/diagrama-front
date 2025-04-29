@@ -33,7 +33,7 @@ export class Lienzo extends Base {
 
             if (
                 maxYInRow === null ||
-                Math.abs(y - maxYInRow) <= 40 // Umbral para considerar misma fila
+                Math.abs(y - maxYInRow) <= 40
             ) {
                 currentRow.push(child);
                 maxYInRow = Math.max(maxYInRow ?? y, y);
